@@ -1,0 +1,35 @@
+/* Custom styles go here */
+.flow-data {
+  position: relative;
+}
+
+.flow-data-content {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  background-color: #0095ff;
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  color: #fff;
+  border-radius: 3px;
+}
+
+.flow-data-content > pre {
+  margin: 0;
+}
+
+.flow-data-toggle-btn {
+  width: 50px;
+  height: 20px;
+  color: #fff;
+  border: 1px #505562 solid;
+  border-radius: 10px;
+  background-color: #0095ff;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.flow-highlight > .djs-visual > :nth-child(1) {
+  stroke: #0095ff !important;
+}
