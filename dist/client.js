@@ -62,7 +62,7 @@ class FlowDataPlugin {
   }
 
   addFlowData(flowEl, isOpen = false) {
-    const exampleData = this.findExampleData(flowEl.source);
+    const exampleData = this.findExampleData(flowEl) || this.findExampleData(flowEl.source);
     if (this.isValidData(exampleData)) {
       const flowDataBadge = new FlowDataBadge(flowEl, this.modelerOverlays, this.markerToggle, exampleData, isOpen);
       this.overlays.set(flowEl.id, flowDataBadge);
