@@ -29,5 +29,8 @@
   "files": [
     "dist",
     "index.js"
-  ]
+  ],
+  "dependencies": {
+    "camunda-modeler-webpack-plugin": "^0.1.0"
+  }
 }

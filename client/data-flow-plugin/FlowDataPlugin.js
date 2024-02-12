@@ -1,42 +1,45 @@
-const PLUGIN_NAME = 'CAMUNDA_MODELER_PLUGIN_VIEW_INPUTS_AND_OUTPUTS';
+const PLUGIN_NAME = 'FlowDataPlugin'
 
 class FlowDataPlugin {
   // Map<string, FlowDataBadge>
   overlays = new Map();
+  isActive = false;
 
   constructor(eventBus, overlays, elementRegistry, canvas) {
     this.modelerEventBus = eventBus;
     this.modelerOverlays = overlays;
     this.modelerElementRegistry = elementRegistry;
-    this.onConnectionAddRemove();
     this.onConnectionChanged();
     this.onElementChanged();
     this.markerToggle = canvas.toggleMarker.bind(canvas);
+    this.modelerEventBus.on('flowDataPlugin.toggle', ({ toggle }) => {
+      this.isActive = toggle;
+      if (toggle) {
+        const flows = this.modelerElementRegistry.filter((el) => !!el.waypoints);
+        flows.forEach((flow) => this.addFlowData(flow));
+      } else {
+        this.overlays.forEach((badge) => this.removeFlowData(badge.flow));
+      }
+    });
   }
 
   onElementChanged() {
     this.modelerEventBus.on(['element.changed'], ({ element }) => {
-      const { outgoing } = element;
-      outgoing?.forEach((flow) => {
-        this.removeFlowData(flow);
-        this.addFlowData(flow);
-      });
+      if (this.isActive) {
+        const { outgoing } = element;
+        outgoing?.forEach((flow) => {
+          this.removeFlowData(flow);
+          this.addFlowData(flow);
+        });
+      }
     });
   }
 
   onConnectionChanged() {
     this.modelerEventBus.on(['connection.changed'], ({ element }) => {
-      this.updateFlowData(element);
-    });
-  }
-
-  onConnectionAddRemove() {
-    this.modelerEventBus.on(['connection.added', 'connection.removed'], ({ element, type }) => {
-      if (type === 'connection.added') {
-        this.addFlowData(element);
-      }
-      if (type === 'connection.removed') {
-        this.removeFlowData(element);
+      if (this.isActive) {
+        this.updateFlowData(element);
+        console.log(element);
       }
     });
   }
@@ -168,13 +171,12 @@ class FlowDataBadge {
   getHtml(content) {
     const parsed = JSON.parse(content);
     const pretty = JSON.stringify(parsed, null, 2);
-    const btnContent = JSON.stringify(parsed);
     return `
       <div class="flow-data">
         <div class="flow-data-content">
           <pre>${pretty}</pre>
         </div>
-        <button class="flow-data-toggle-btn">${btnContent}</button>
+        <button class="flow-data-toggle-btn"></button>
       </div>`
   }
 
@@ -185,7 +187,9 @@ class FlowDataBadge {
   }
 
   toggleBadgeView() {
-    this.toggleBtn.textContent = this.isOpen ? 'Hide' : JSON.stringify(JSON.parse(this.data));
+    const parsed = JSON.parse(this.data);
+    const key = Object.keys(parsed)?.[0] || JSON.stringify(parsed);
+    this.toggleBtn.textContent = this.isOpen ? 'Hide' : key;
     this.isOpen ? this.showFlowDataContent() : this.hideFlowDataContent();
   }
 
