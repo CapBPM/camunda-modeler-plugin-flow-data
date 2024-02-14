@@ -20,7 +20,7 @@
 }
 
 .flow-data-toggle-btn {
-  width: 50px;
+  min-width: 50px;
   height: 20px;
   color: #fff;
   border: 1px #505562 solid;
